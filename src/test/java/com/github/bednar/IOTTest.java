@@ -50,9 +50,9 @@ public class IOTTest {
     @Test
     public void iot() throws Exception {
 
-        String bucketID = "0353aae6fb437000";
-        String orgID = "0353aae6fac37000";
-        String token = "3806MxbsBaNveBJVc3ZQ1O0LkFCpOIoy9Fo5Aw-xDc_HzSNrtWyo4kpg3LndxjrHs7pUMAUaADDPY6GqwKzkEQ==";
+        String bucketID = "0353ae6c2d397000";
+        String orgID = "0353ae6c2cb97000";
+        String token = "M8q4d2fm_PcZRK-X6y5SDwtBFMd8dex6LHtaipNSIAYD1FtGU-SscR0IiYXrPSl7uesUHMuvYz2VOJFVoL0MJg==";
 
         //
         // Init Client
@@ -65,7 +65,7 @@ public class IOTTest {
 
         WriteClient writeClient = platform.createWriteClient();
 
-        Instant now = Instant.now().minus(1, ChronoUnit.MINUTES);
+        Instant now = Instant.ofEpochSecond(1548851316);
 
         // Mensuration 1
         Point weatherOutdoor1 = Point.measurement("weather_outdoor")
@@ -155,7 +155,6 @@ public class IOTTest {
         printResult(flux, tables);
 
         platform.close();
-
     }
 
     private void printResult(final String flux, @Nonnull final List<FluxTable> tables) {
