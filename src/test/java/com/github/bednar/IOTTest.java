@@ -33,9 +33,12 @@ import org.influxdata.platform.PlatformClient;
 import org.influxdata.platform.PlatformClientFactory;
 import org.influxdata.platform.QueryClient;
 import org.influxdata.platform.WriteClient;
+import org.influxdata.platform.domain.OnboardingResponse;
+import org.influxdata.platform.error.rest.UnprocessableEntityException;
 import org.influxdata.platform.write.Point;
 
 import de.vandermeer.asciitable.AsciiTable;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,17 +50,52 @@ public class IOTTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(IOTTest.class);
 
+    private static String url = "http://localhost:9999";
+
+    private static String bucketID;
+    private static String orgID;
+    private static String token;
+
+    @BeforeClass
+    public static void onboarding() throws Exception {
+
+        String username = "admin";
+        String password = "111111";
+        
+        try {
+
+            //
+            // Do onboarding
+            //
+            OnboardingResponse response = PlatformClientFactory
+                    .onBoarding(url, username, password, "Testing", "my-bucket");
+
+            bucketID = response.getBucket().getId();
+            orgID = response.getOrganization().getId();
+            token = response.getAuthorization().getToken();
+
+        } catch (UnprocessableEntityException exception) {
+
+            //
+            // Onboarding already done
+            //
+            PlatformClient platformClient = PlatformClientFactory.create(url, username, password.toCharArray());
+
+            bucketID = platformClient.createBucketClient().findBuckets().get(0).getId();
+            orgID = platformClient.createOrganizationClient().findOrganizations().get(0).getId();
+            token = platformClient.createAuthorizationClient().findAuthorizations().get(0).getToken();
+
+            platformClient.close();
+        }
+    }
+
     @Test
     public void iot() throws Exception {
-
-        String bucketID = "0353ae6c2d397000";
-        String orgID = "0353ae6c2cb97000";
-        String token = "M8q4d2fm_PcZRK-X6y5SDwtBFMd8dex6LHtaipNSIAYD1FtGU-SscR0IiYXrPSl7uesUHMuvYz2VOJFVoL0MJg==";
 
         //
         // Init Client
         //
-        PlatformClient platform = PlatformClientFactory.create("http://localhost:9999", token.toCharArray());
+        PlatformClient platform = PlatformClientFactory.create(url, token.toCharArray());
 
         //
         // Write IOT Data
